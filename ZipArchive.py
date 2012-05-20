@@ -23,6 +23,7 @@ class ZipArchive(ZipFS):
             fileMainName = u'main.xml'
             fileMain = self.open(fileMainName, 'w')
             fileMain.write(dictImageNames[fileMainName])
+            del dictImageNames[fileMainName]
             fileMain.close()
 
             dirImg = self.makeopendir('img')
@@ -55,14 +56,15 @@ class ZipArchive(ZipFS):
             dictImageNames[fileMainName] = fileMain.read()
             fileMain.close()
 
-            dirImg = self.opendir('img')
+            if u'img' in self.listdir():
+                dirImg = self.opendir('img')
 
-            for fileName in dirImg.listdir():
-                fileImg = dirImg.open(fileName)
-                dictImageNames[fileName] = fileImg.read()
-                fileImg.close()
+                for fileName in dirImg.listdir():
+                    fileImg = dirImg.open(fileName)
+                    dictImageNames[fileName] = fileImg.read()
+                    fileImg.close()
 
-            dirImg.close()
+                dirImg.close()
         except ResourceNotFoundError:
             return False
 
