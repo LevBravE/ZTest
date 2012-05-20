@@ -26,6 +26,7 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         self.__lstQuestions = []
         self.__lstAnswers = []
         self.__dictImageNames = {}
+        self.__strXmlVersion = u'2.0'
         # HtmlContent
         self.__htmlContent = HtmlContent()
 
@@ -90,7 +91,7 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         self.__dictImageNames[u'main.xml'] = self.toByteArray(indentSize)
 
         # Write Zip
-        zipFile = ZipArchive(self.__strFileName, 'a', encoding='UTF-8')
+        zipFile = ZipArchive(self.__strFileName, 'a')
 
         if not zipFile._write(self.__dictImageNames):
             return False
@@ -116,7 +117,8 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         self.__dictImageNames = {}
 
         root = self.createElement('test')
-        root.setAttribute('version', u'1.0')
+        root.setAttribute('version', self.__strXmlVersion)
+        root.setAttribute('chair', self.__lstTests[0].chair)
         root.setAttribute('author', self.__lstTests[0].author)
         root.setAttribute('subjectName', self.__lstTests[0].subjectName)
         root.setAttribute('attestation', self.__lstTests[0].attestation)
@@ -133,6 +135,15 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         if self.__lstQuestions:
             for questionsIndex, questionItem in enumerate(self.__lstQuestions):
                 question = self.createElement('question')
+
+                colRight = 0
+                for answerItem in self.__lstAnswers[questionsIndex]:
+                    if answerItem.right:
+                        colRight += 1
+
+                if colRight > 1:
+                    questionItem.typeQuestion = 1
+
                 question.setAttribute('typeQuestion', questionItem.typeQuestion)
                 question.setAttribute('weight', questionItem.weight)
 
@@ -181,6 +192,7 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         Анализ xml документа
         """
         test = Test()
+        test.chair = root.attribute('chair')
         test.author = root.attribute('author')
         test.subjectName = root.attribute('subjectName')
         test.attestation = root.attribute('attestation')
@@ -252,7 +264,7 @@ class ReadOrWriteFile(QtXml.QDomDocument):
         self.__lstQuestions = []
         self.__lstAnswers = []
         # Read Zip
-        zipFile = ZipArchive(self.__strFileName, encoding='UTF-8')
+        zipFile = ZipArchive(self.__strFileName)
 
         self.__dictImageNames = zipFile._read()
 
@@ -267,8 +279,10 @@ class ReadOrWriteFile(QtXml.QDomDocument):
             return False
 
         root = self.documentElement()
-        if root.tagName() != 'test' and root.attribute('version') == u'1.0':
-            return False
+
+        if root.tagName() != 'test' or root.attribute('version') != self.__strXmlVersion:
+            error = 2
+            return error
 
         if not self._parse(root):
             return False
