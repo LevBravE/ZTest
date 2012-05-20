@@ -8,6 +8,7 @@ from PySide import QtCore
 #**************************************************************************************************
 # class: Test
 # data:
+#   chair (string) - Кафедра
 #   author (string) - Фамилия Имя Отчество автора теста
 #   lstSpecialties (list) - Код дисциплины
 #   subjectName (string) - Наименование дисциплины
@@ -15,8 +16,9 @@ from PySide import QtCore
 #**************************************************************************************************
 
 class Test(QtCore.QObject):
-    def __init__(self, author='', lstSpecialties=None, subjectName='', attestation=0):
+    def __init__(self, chair='', author='', lstSpecialties=None, subjectName='', attestation=0):
         QtCore.QObject.__init__(self)
+        self.__chair = chair
         self.__author = author
         self.__lstSpecialties = lstSpecialties
         self.__subjectName = subjectName
@@ -25,6 +27,8 @@ class Test(QtCore.QObject):
     changed = QtCore.Signal()
 
     # Methods get and set (START)
+    def _chair(self): return self.__chair
+
     def _author(self): return self.__author
 
     def _lstSpecialties(self): return self.__lstSpecialties
@@ -32,6 +36,10 @@ class Test(QtCore.QObject):
     def _subjectName(self): return  self.__subjectName
 
     def _attestation(self): return self.__attestation
+
+    def _setChair(self, chair):
+        self.__chair = chair
+        self.changed.emit()
 
     def _setAuthor(self, author):
         self.__author = author
@@ -49,8 +57,9 @@ class Test(QtCore.QObject):
         self.__attestation = attestation
         self.changed.emit()
 
-        # Methods get and set (END)
+    # Methods get and set (END)
 
+    chair = QtCore.Property(int, _chair, _setChair, notify=changed)
     author = QtCore.Property(str, _author, _setAuthor, notify=changed)
     lstSpecialties = QtCore.Property(list, _lstSpecialties, _setLstSpecialties, notify=changed)
     subjectName = QtCore.Property(str, _subjectName, _setSubjectName, notify=changed)
