@@ -4,6 +4,7 @@
 __author__ = 'levbrave'
 
 from PySide import QtCore, QtGui
+from DataSql import DataSql
 
 #**************************************************************************************************
 # class: TreeWidgetTest
@@ -16,13 +17,22 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         self.__lstQuestions = []
         self.__lstAnswers = []
         self.__item = None
-
+        self.__intIndentation = 4
+        # DataSql
+        self.__dataSql = DataSql()
+        # HeaderView
+        self.__header = QtGui.QHeaderView(QtCore.Qt.Horizontal)
+        self.__header.setResizeMode(QtGui.QHeaderView.Stretch)
+        self.__header.setDefaultAlignment(QtCore.Qt.AlignLeft)
         # Icon
         self.__testIcon = QtGui.QIcon()
         self.__testIcon.addPixmap(QtGui.QPixmap('img/black/png/book_side_icon&16.png'),
             QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.__testIcon.addPixmap(QtGui.QPixmap('img/black/png/book_icon&16.png'),
             QtGui.QIcon.Normal, QtGui.QIcon.On)
+
+        self.__chairIcon = QtGui.QIcon()
+        self.__chairIcon.addPixmap(QtGui.QPixmap('img/chair16x16.png'))
 
         self.__authorIcon = QtGui.QIcon()
         self.__authorIcon.addPixmap(QtGui.QPixmap('img/black/png/user_icon&16.png'))
@@ -50,11 +60,25 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         # <<<Self>>>
         pal = QtGui.QPalette()
         pal.setColor(QtGui.QPalette.Base, QtGui.QColor(QtCore.Qt.darkGray))
-        self.header().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.setHeaderLabel(self.tr('Список вопросов'))
         palette = QtGui.QApplication.palette()
         self.setPalette(palette)
-        #self.setBackgroundRole(QtGui.QPalette.Dark)
+        self.setHeader(self.__header)
+        self.setHeaderLabel('>')
+
+    def _chair(self, code):
+        """
+        Получаем кафеду
+        """
+        queryChair = 'SELECT name FROM chair WHERE code LIKE %s' % code
+        lstChair = self.__dataSql._queryCreateDataOrChair(queryChair)
+
+        if lstChair:
+            return lstChair[0]
+        else:
+            QtGui.QMessageBox.critical(self, self.tr('Ошибка'),
+                self.tr('Критическая ошибка!\n'
+                        'Необходимо обратиться к разработчику.'))
+            return []
 
     # GET and SET (Start)
     def _lstTests(self): return self.__lstTests
@@ -100,6 +124,15 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         self.__item.setText(0, test)
 
         self.setItemExpanded(self.__item, True)
+        # Test chair
+        itemChair = self._createItem(self.__item)
+
+        code = self.__lstTests[0].chair
+        chair = self._chair(str(code))
+
+        itemChair.setFlags(QtCore.Qt.NoItemFlags)
+        itemChair.setIcon(0, self.__chairIcon)
+        itemChair.setText(0, chair)
         # Test author
         itemAuthor = self._createItem(self.__item)
 
@@ -119,7 +152,7 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         # Test specialty
         itemSpecialty = self._createItem(self.__item)
 
-        specialty = self.tr('специальности(%d)') % len(self.__lstTests[0].lstSpecialties)
+        specialty = self.tr('специальности[%d]') % len(self.__lstTests[0].lstSpecialties)
 
         itemSpecialty.setFlags(QtCore.Qt.NoItemFlags)
         itemSpecialty.setIcon(0, self.__specialtyIcon)
@@ -144,7 +177,8 @@ class TreeWidgetTest(QtGui.QTreeWidget):
                 number = questionsIndex + 1
 
                 if questionItem.document.toPlainText():
-                    itemQuestion.setText(0, self.tr('вопрос (%s)') % number)
+                    itemQuestion.setText(0,
+                        self.tr('вопрос (%s)->[%s]') % (number, len(self.__lstAnswers[questionsIndex])))
                 else:
                     itemQuestion.setFont(0, font)
                     itemQuestion.setText(0, self.tr('-задайте вопрос-'))
@@ -191,9 +225,6 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         return item
 
     def _setTextTreeItem(self, itemTree, itemIndex, flagType, flagEmpty):
-        strType = ''
-        strNumber = ''
-
         if flagType:
             strType = u'вопрос'
             strNumber = u'(%s)' % (itemIndex + 1)
@@ -206,7 +237,12 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         if flagEmpty:
             font.setItalic(False)
             itemTree.setFont(0, font)
-            itemTree.setText(0, self.tr('%s %s') % (strType, strNumber))
+            childCount = itemTree.childCount()
+
+            if flagType and childCount and itemTree.child(0).text(0) != u'пусто':
+                itemTree.setText(0, self.tr('вопрос %s->[%s]') % (strNumber, childCount))
+            else:
+                itemTree.setText(0, self.tr('%s %s') % (strType, strNumber))
         else:
             font.setItalic(True)
             itemTree.setFont(0, font)
@@ -226,9 +262,9 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         self.setCurrentItem(itemTree)
 
     def _addQuestion(self, itemRoot, questionsIndex):
-        item = itemRoot.child(3)
+        item = itemRoot.child(self.__intIndentation)
         if item.text(0) == u'пусто':
-            item = itemRoot.takeChild(3)
+            item = itemRoot.takeChild(self.__intIndentation)
             del item
 
         font = QtGui.QFont()
@@ -254,14 +290,14 @@ class TreeWidgetTest(QtGui.QTreeWidget):
 
     def _deleteQuestion(self, questionsIndex, lstQuestions):
         if self.__item:
-            item = self.__item.takeChild(questionsIndex + 3)
+            item = self.__item.takeChild(questionsIndex + self.__intIndentation)
             del item
 
             font = QtGui.QFont()
             font.setItalic(True)
 
             if lstQuestions:
-                iterator = QtGui.QTreeWidgetItemIterator(self.__item.child(3),
+                iterator = QtGui.QTreeWidgetItemIterator(self.__item.child(self.__intIndentation),
                     QtGui.QTreeWidgetItemIterator.HasChildren)
                 number = 1
 
@@ -269,7 +305,8 @@ class TreeWidgetTest(QtGui.QTreeWidget):
                     if not lstQuestions[number - 1].document.toPlainText():
                         iterator.value().setText(0, self.tr('-задайте вопрос-'))
                     else:
-                        iterator.value().setText(0, self.tr('вопрос (%s)') % number)
+                        iterator.value().setText(0,
+                            self.tr('вопрос (%s)->[%s]') % (number, iterator.value().childCount()))
 
                     iterator.value().setText(1, str(number - 1))
 
@@ -277,9 +314,9 @@ class TreeWidgetTest(QtGui.QTreeWidget):
                     iterator += 1
 
                     if questionsIndex:
-                        self.setCurrentItem(self.__item.child(questionsIndex + 2))
-                    else:
                         self.setCurrentItem(self.__item.child(questionsIndex + 3))
+                    else:
+                        self.setCurrentItem(self.__item.child(questionsIndex + self.__intIndentation))
             else:
                 itemQuestionEmpty = self._createItem(self.__item)
                 itemQuestionEmpty.setFlags(QtCore.Qt.NoItemFlags)
@@ -305,6 +342,10 @@ class TreeWidgetTest(QtGui.QTreeWidget):
         itemAnswer.setText(0, answer)
         itemAnswer.setText(1, str(questionsIndex))
         itemAnswer.setText(2, str(answersIndex))
+
+        if itemQuestion.text(0) != u'-задайте вопрос-':
+            number = int(itemQuestion.text(1)) + 1
+            itemQuestion.setText(0, self.tr('вопрос (%s)->[%s]') % (number, itemQuestion.childCount()))
 
         self.addTopLevelItem(itemQuestion)
         self.setItemExpanded(self.__item, True)
@@ -339,11 +380,17 @@ class TreeWidgetTest(QtGui.QTreeWidget):
                     number += 1
                     iterator += 1
 
+                number = int(itemQuestion.text(1)) + 1
+                itemQuestion.setText(0, self.tr('вопрос (%s)->[%s]') % (number, itemQuestion.childCount()))
+
                 if answersIndex:
                     self.setCurrentItem(itemQuestion.child(answersIndex - 1))
                 else:
                     self.setCurrentItem(itemQuestion.child(answersIndex))
             else:
+                number = int(itemQuestion.text(1)) + 1
+                itemQuestion.setText(0, self.tr('вопрос (%s)') % number)
+
                 itemAnswer = self._createItem(itemQuestion)
                 itemAnswer.setFlags(QtCore.Qt.NoItemFlags)
                 itemAnswer.setFont(0, font)
