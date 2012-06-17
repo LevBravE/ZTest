@@ -19,6 +19,7 @@ class DialogNewTest(QtGui.QDialog):
 
     def __init__(self, title):
         QtGui.QDialog.__init__(self)
+        self.__changeChair = False
         self.__changeAttestation = False
         self.__changeSpecialty = False
         # DataSql
@@ -31,8 +32,13 @@ class DialogNewTest(QtGui.QDialog):
         # ListView
         self.__specialtyListWidget = QtGui.QListWidget()
         # ComboBox
+        self.__chairComboBox = QtGui.QComboBox()
+        self.__chairComboBox.insertItem(0, self.tr('.::вбрать кафедру::.'))
+        self.__chairComboBox.addItems(self._lstChair())
+
         self.__attestationComboBox = QtGui.QComboBox()
-        self.__attestationComboBox.insertItem(0, self.tr('<<вбрать аттестацию>>'))
+        self.__attestationComboBox.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToMinimumContentsLength)
+        self.__attestationComboBox.insertItem(0, self.tr('.::вбрать аттестацию::.'))
         self.__attestationComboBox.insertItem(1, self.tr('Аттестация №1'))
         self.__attestationComboBox.insertItem(2, self.tr('Аттестация №2'))
         self.__attestationComboBox.insertItem(3, self.tr('Аттестация №3'))
@@ -72,13 +78,18 @@ class DialogNewTest(QtGui.QDialog):
 
         self.__dialogButtonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
         # Layout
+        self.__layoutVChair = QtGui.QVBoxLayout()
+        self.__layoutVChair.addWidget(QtGui.QLabel(self.tr('Выберите: кафедру по наименованию')))
+        self.__layoutVChair.addWidget(self.__chairComboBox)
+        self.__layoutVChair.addStretch(10)
+
         self.__layoutVContentLeft = QtGui.QVBoxLayout()
         self.__layoutVContentLeft.addWidget(QtGui.QLabel(self.tr('Введите: фамилию имя отчество')))
         self.__layoutVContentLeft.addWidget(self.__authorLineEdit)
-        self.__layoutVContentLeft.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
+        self.__layoutVContentLeft.addStretch(10)
         self.__layoutVContentLeft.addWidget(QtGui.QLabel(self.tr('Введите: наименование предмета')))
         self.__layoutVContentLeft.addWidget(self.__subjectNameLineEdit)
-        self.__layoutVContentLeft.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
+        self.__layoutVContentLeft.addStretch(10)
         self.__layoutVContentLeft.addWidget(QtGui.QLabel(self.tr('Выберите: номер аттестации')))
         self.__layoutVContentLeft.addWidget(self.__attestationComboBox)
 
@@ -92,15 +103,16 @@ class DialogNewTest(QtGui.QDialog):
 
         self.__layoutHContent = QtGui.QHBoxLayout()
         self.__layoutHContent.addLayout(self.__layoutVContentLeft)
-        self.__layoutHContent.addWidget(FrameSeparator(QtGui.QFrame.VLine, QtGui.QFrame.Sunken))
         self.__layoutHContent.addLayout(self.__layoutVContentRight)
 
         self.__layoutVMain = QtGui.QVBoxLayout()
-        self.__layoutVMain.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
+        self.__layoutVMain.addLayout(self.__layoutVChair)
         self.__layoutVMain.addLayout(self.__layoutHContent)
         self.__layoutVMain.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
         self.__layoutVMain.addWidget(self.__dialogButtonBox)
         # Connect
+        self.__chairComboBox.currentIndexChanged.connect(self._currentChangeChair)
+
         self.__attestationComboBox.currentIndexChanged.connect(self._currentChangedAttestation)
 
         self.__specialtyListWidget.itemSelectionChanged.connect(self._enabledButtonDelete)
@@ -117,6 +129,7 @@ class DialogNewTest(QtGui.QDialog):
         self.setModal(True)
         self.setWindowTitle(title)
         self.setFocus()
+        self.resize(self.width(), self.minimumHeight())
 
     def _verification(self):
         """
@@ -124,6 +137,8 @@ class DialogNewTest(QtGui.QDialog):
         """
         errorString = ''
 
+        if not self.__chairComboBox.currentIndex():
+            errorString += 'Выберите: кафедру\n'
         if not self.__authorLineEdit.text():
             errorString += 'Введите: фамилию имя отчество\n'
         if not self.__subjectNameLineEdit.text():
@@ -134,11 +149,28 @@ class DialogNewTest(QtGui.QDialog):
             errorString += 'Добавьте: перечень специальностей'
 
         if errorString:
-            QtGui.QMessageBox.warning(self, self.tr('DSTU-TestTemplate'),
+            QtGui.QMessageBox.warning(self, self.tr('Внимание!'),
                 self.tr(errorString))
             return
 
         self.accept()
+
+    def _lstChair(self):
+        """
+        Получает список кафедр
+        """
+        queryChair = 'SELECT name FROM chair'
+        lstChair = self.__dataSql._queryCreateDataOrChair(queryChair)
+
+        if lstChair:
+            return lstChair
+        else:
+            QtGui.QMessageBox.critical(self, self.tr('Ошибка'),
+                self.tr('Критическая ошибка!\n'
+                        'Необходимо обратиться к разработчику.'))
+            return []
+
+    def _chairComboBox(self): return self.__chairComboBox.currentIndex()
 
     def _authorLineEdit(self): return self.__authorLineEdit.text()
 
@@ -157,6 +189,10 @@ class DialogNewTest(QtGui.QDialog):
 
         return lstSpecialties
 
+    def _setChairComboBox(self, chair):
+        self.__chairComboBox.setCurrentIndex(chair)
+        self.__changeChair = False
+
     def _setAuthorLineEdit(self, author):
         self.__authorLineEdit.setText(author)
 
@@ -174,7 +210,9 @@ class DialogNewTest(QtGui.QDialog):
             self.__specialtyListWidget.addItem(item)
 
     def _isModified(self):
-        if self.__authorLineEdit.isModified():
+        if self.__changeChair:
+            return True
+        elif self.__authorLineEdit.isModified():
             return True
         elif self.__subjectNameLineEdit.isModified():
             return True
@@ -184,6 +222,10 @@ class DialogNewTest(QtGui.QDialog):
             return True
 
         return False
+
+    def _currentChangeChair(self):
+        self.__changeChair = True
+        print self.__chairComboBox.currentIndex()
 
     def _currentChangedAttestation(self):
         self.__changeAttestation = True
@@ -244,9 +286,9 @@ class DialogNewTest(QtGui.QDialog):
 if __name__ == '__main__':
     import sys
 
-    DataSql()._connectDataBase('sqlite/test_template.sqlite')
-    QtCore.QTextCodec.setCodecForTr(QtCore.QTextCodec.codecForName('UTF-8'))
     app = QtGui.QApplication(sys.argv)
+    DataSql()._connectDataBase('sqlite/db_ztest.sqlite')
+    QtCore.QTextCodec.setCodecForTr(QtCore.QTextCodec.codecForName('UTF-8'))
     dialogNewTest = DialogNewTest('Hellow World!')
     sys.exit(dialogNewTest.exec_())
 
