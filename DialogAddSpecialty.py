@@ -35,10 +35,8 @@ class DialogAddSpecialty(QtGui.QDialog):
         self.__dialogButtonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
         # Layout
         self.__layoutVMain = QtGui.QVBoxLayout()
-        self.__layoutVMain.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
         self.__layoutVMain.addWidget(QtGui.QLabel(self.tr('Выберите: уровень подготовки')))
         self.__layoutVMain.addWidget(self.__qualificationComboBox)
-        self.__layoutVMain.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
         self.__layoutVMain.addWidget(QtGui.QLabel(self.tr('Введите: номер специальности')))
         self.__layoutVMain.addWidget(self.__lineEditAutoComplete)
         self.__layoutVMain.addWidget(FrameSeparator(QtGui.QFrame.HLine, QtGui.QFrame.Sunken))
@@ -69,7 +67,7 @@ class DialogAddSpecialty(QtGui.QDialog):
                 errorString += 'Нет такой специальности.'
 
         if errorString:
-            QtGui.QMessageBox.warning(self, self.tr('DSTU-TestTemplate'),
+            QtGui.QMessageBox.warning(self, self.tr('Внимание!'),
                 self.tr(errorString))
             return
 
@@ -84,12 +82,12 @@ class DialogAddSpecialty(QtGui.QDialog):
                          'FROM specialty '\
                          'WHERE type LIKE %s'
         querySpecialty = querySpecialty.replace('%s', str(qualification))
-        lstSpecialty = self.__dataSql._query(querySpecialty)
+        lstSpecialty = self.__dataSql._querySpecialty(querySpecialty)
 
         if lstSpecialty:
             return lstSpecialty
         else:
-            QtGui.QMessageBox.critical(self, self.tr('DSTU-TestTemplate'),
+            QtGui.QMessageBox.critical(self, self.tr('Ошибка'),
                 self.tr('Критическая ошибка!\n'
                         'Необходимо обратиться к разработчику.'))
             return []
@@ -115,8 +113,8 @@ class DialogAddSpecialty(QtGui.QDialog):
 if __name__ == '__main__':
     import sys
 
-    DataSql()._connectDataBase('sqlite/db_specialties.sqlite')
-    QtCore.QTextCodec.setCodecForTr(QtCore.QTextCodec.codecForName('UTF-8'))
     app = QtGui.QApplication(sys.argv)
+    DataSql()._connectDataBase('sqlite/db_ztest.sqlite')
+    QtCore.QTextCodec.setCodecForTr(QtCore.QTextCodec.codecForName('UTF-8'))
     dialogAddSpecialty = DialogAddSpecialty(app.tr('Добавить специальность'))
     sys.exit(dialogAddSpecialty.exec_())
