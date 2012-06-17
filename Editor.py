@@ -17,7 +17,7 @@ class Editor(QtGui.QWidget):
     Диалоговое окно редактора
     """
 
-    def __init__(self, flagAnswer=False):
+    def __init__(self):
         QtGui.QWidget.__init__(self)
         self.__changeCheckBox = False
         # DataSql
@@ -26,9 +26,7 @@ class Editor(QtGui.QWidget):
         self.__textEdit = TextEditInsertImage()
         # QCheckBox
         self.__checkBox = QtGui.QCheckBox(self.tr('это правильный ответ'))
-        if not flagAnswer:
-            self.__checkBox.setVisible(False)
-            # ToolBar
+        # ToolBar
         self.__oneLineToolBar = QtGui.QToolBar()
         # ComboBox
         self.__sizeComboBox = QtGui.QComboBox()
@@ -36,13 +34,12 @@ class Editor(QtGui.QWidget):
         for size in db.standardSizes():
             self.__sizeComboBox.addItem(str(size))
             # Layout
-        self.__layoutHToolBarOneLine = QtGui.QHBoxLayout()
-        self.__layoutHToolBarOneLine.addWidget(self.__oneLineToolBar)
-
         self.__layoutVMain = QtGui.QVBoxLayout()
-        self.__layoutVMain.addLayout(self.__layoutHToolBarOneLine)
+        self.__layoutVMain.addWidget(self.__oneLineToolBar)
         self.__layoutVMain.addWidget(self.__textEdit)
         self.__layoutVMain.addWidget(self.__checkBox)
+        self.__layoutVMain.setSpacing(0)
+        self.__layoutVMain.setContentsMargins(0, 0, 0, 0)
         # Functions
         self._createActions()
         self._adjustActions()
@@ -60,11 +57,12 @@ class Editor(QtGui.QWidget):
         self.__textEdit.copyAvailable.connect(self.__actionEditCopy.setEnabled)
 
         self.__sizeComboBox.activated.connect(self._textSize)
-
-        self.__checkBox.stateChanged.connect(self._currentStateChanged)
         # <<<Self>>>
         self.setLayout(self.__layoutVMain)
-        self.setFocus()
+        #self.setFocus()
+
+    def _checkBox(self):
+        return self.__checkBox
 
     def _createActions(self):
         # Action Edit
@@ -173,6 +171,9 @@ class Editor(QtGui.QWidget):
         self.__oneLineToolBar.addWidget(self.__sizeComboBox)
         self.__oneLineToolBar.addSeparator()
         self.__oneLineToolBar.addAction(self.__actionInsertImage)
+
+    def _clear(self):
+        self.__textEdit.clear()
 
     # MENU Get (Start)
     def _actionEditUndo(self): return self.__actionEditUndo
@@ -325,31 +326,9 @@ class Editor(QtGui.QWidget):
         imageFormat.setName(url.toString())
         cursor.insertImage(imageFormat)
 
-    def _currentStateChanged(self):
-        self.__changeCheckBox = True
-
-    def _isModified(self):
-        if self.__textEdit.document().isModified():
-            return True
-        if self.__changeCheckBox:
-            return True
-
-        return False
-
-    def _right(self):
-        if self.__checkBox.checkState():
-            return True
-        else:
-            return False
-
     def _setDocument(self, document):
         self.__textEdit.setDocument(document)
         self.__textEdit.document().setModified(False)
-
-    def _setRight(self, state):
-        self.__checkBox.setCheckState(state)
-        self.__changeCheckBox = False
-
 
 if __name__ == '__main__':
     import sys
