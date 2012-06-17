@@ -1,0 +1,430 @@
+/*######################################################################################################################
+# Author: LevBravE
+# Email: lev.brave@gmail.com
+# Description: Style of application zTest
+######################################################################################################################*/
+
+/* MainWindow of Start ************************************************************************************************/
+QMainWindow {
+    background: white;
+}
+
+QMainWindow::separator {
+     background: darkgray;
+     width: 1px; /* when vertical */
+     height: 1px; /* when horizontal */
+ }
+/* MainWindow of End **************************************************************************************************/
+
+/* MenuBar of Start ***************************************************************************************************/
+QMenuBar {
+    border: 1px solid silver;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                      stop:0 ghostwhite, stop:1 whitesmoke);
+}
+
+QMenuBar::item {
+    padding: 6px 8px 1px 8px;
+    background: transparent;
+}
+
+QMenuBar::item:pressed {
+    color: white;
+    background: royalblue;
+}
+/* MenuBar of End *****************************************************************************************************/
+
+/* Menu of Start ******************************************************************************************************/
+QMenu {
+    border: 1px solid silver;
+    background-color: whitesmoke;
+    margin: 0px; /* some spacing around the menu */
+}
+
+QMenu::item:selected {
+    color: white;
+    background: royalblue;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: silver;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+/* Menu of End ********************************************************************************************************/
+
+/* ToolBar of Start ***************************************************************************************************/
+QToolBar {
+    border: 1px solid silver;
+    border-top-color: transparent;
+    background: gainsboro;
+    spacing: 2px; /* spacing between items in the tool bar */
+}
+
+QToolBar::separator {
+    background: grey;
+    width: 1px; /* when vertical */
+    height: 1px; /* when horizontal */
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+/* ToolBar of End *****************************************************************************************************/
+
+/* ToolButton of Start ************************************************************************************************/
+QToolButton:hover {
+    border: 1px solid darkblue;
+    background: lightskyblue;
+}
+
+QToolButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 lightskyblue, stop: 1 #f6f7fa);
+}
+
+QToolButton:checked {
+    border: 1px solid darkblue;
+    background: cadetblue;
+}
+/* ToolButton of End **************************************************************************************************/
+
+/* DockWidget of Start ************************************************************************************************/
+QDockWidget {
+     border: 1px solid lightgray;
+     titlebar-close-icon: url(img/black/png/delete_icon16.png);
+     titlebar-normal-icon: url(img/black/png/app_window_black_icon16.png);
+ }
+
+QDockWidget::title {
+    text-align: left;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #cccccc, stop: 1 lightgrey);
+    padding: 5px;
+}
+
+QDockWidget::close-button, QDockWidget::float-button {
+    background: gainsboro;
+    padding: 0px;
+    icon-size: 30px; /* maximum icon size */
+}
+
+QDockWidget::close-button:hover, QDockWidget::float-button:hover {
+    background: gainsboro;
+}
+
+QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
+    padding: 1px -1px -1px 1px;
+}
+/* DockWidget of End **************************************************************************************************/
+
+/* TreeView of Start **************************************************************************************************/
+QTreeView {
+    show-decoration-selected: 1;
+}
+
+QTreeView::item {
+    border: 0px solid #d9d9d9;
+    padding: 3px;
+}
+
+QTreeView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
+    border: 1px solid #bfcde4;
+}
+
+QTreeView::item:selected {
+    border: 1px solid #567dbc;
+}
+
+QTreeView::item:selected:active{
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
+}
+
+QTreeView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
+}
+
+QTreeView::branch {
+    background: palette(base);
+}
+
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(img/stylesheet-vline.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(img/stylesheet-branch-more.png) 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(img/stylesheet-branch-end.png) 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(img/stylesheet-branch-closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(img/stylesheet-branch-open.png);
+}
+/* TreeView of End ****************************************************************************************************/
+
+/* HeaderView of Start ************************************************************************************************/
+QHeaderView::section {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                              stop: 0 #cccccc, stop: 1 lightgrey);
+    color: grey;
+    padding: 5px;
+    border-top: 0px solid lightgray;
+}
+/* HeaderView of End **************************************************************************************************/
+
+/* ScrollBar of Start *************************************************************************************************/
+/* vertical */
+QScrollBar:vertical {
+    border: 1px solid silver;
+    width: 12px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    border: 1px solid silver;
+    border-radius: 10px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                                  stop: 0 white, stop: 1 darkgray);
+    min-height: 20px;
+}
+
+QScrollBar::handle:hover:vertical {
+    background: darkgray;
+}
+
+QScrollBar::add-line:vertical {
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: 2px solid grey;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* horizontal */
+QScrollBar:horizontal {
+    border: 1px solid silver;
+    height: 12px;
+    margin: 0;
+}
+
+QScrollBar::handle:horizontal {
+    border: 1px solid silver;
+    border-radius: 10px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                                  stop: 0 white, stop: 1 darkgray);
+    min-width: 20px;
+}
+
+QScrollBar::handle:hover:horizontal {
+    background: darkgray;
+}
+
+QScrollBar::add-line:horizontal {
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+    border: 2px solid grey;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+/* ScrollBar of End ***************************************************************************************************/
+
+/* StatusBar of Start *************************************************************************************************/
+QStatusBar {
+    border: 1px solid silver;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                          stop:0 ghostwhite, stop:1 whitesmoke);
+}
+/* StatusBar of End ***************************************************************************************************/
+
+/* PushButton of Start ************************************************************************************************/
+QPushButton {
+    border: 1px solid silver;
+    border-radius: 3px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
+    min-width: 80px;
+    padding: 3px;
+}
+
+QPushButton:hover {
+    border: 1px solid grey;
+}
+
+QPushButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+QPushButton:flat {
+    border: none; /* no border for a flat push button */
+}
+
+QPushButton:default {
+    border-color: navy; /* make the default button prominent */
+}
+/* PushButton of End **************************************************************************************************/
+
+/* ComboBox of Start **************************************************************************************************/
+QComboBox {
+    border: 1px solid gray;
+    border-radius: 3px;
+    padding: 1px 3px 1px 3px;
+}
+
+QComboBox:editable {
+    background: white;
+}
+
+QComboBox:!editable, QComboBox::drop-down:editable {
+     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+}
+
+/* QComboBox gets the "on" state when the popup is open */
+QComboBox:!editable:on, QComboBox::drop-down:editable:on {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #D3D3D3, stop: 0.4 #D8D8D8,
+                                stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1);
+}
+
+QComboBox:on { /* shift the text when the popup opens */
+    padding-top: 3px;
+    padding-left: 4px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+
+    border-left-width: 1px;
+    border-left-color: darkgray;
+    border-left-style: solid; /* just a single line */
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    image: url(img/bullet_arrow_down.png);
+}
+
+QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+    top: 1px;
+    left: 1px;
+}
+/* ComboBox of End ****************************************************************************************************/
+
+/* LineEdit of Start **************************************************************************************************/
+QLineEdit {
+    border: 1px solid gray;
+    border-radius: 3px;
+    padding: 3px 3px;
+    background: white;
+    selection-background-color: mediumslateblue;
+}
+/* LineEdit of End ****************************************************************************************************/
+
+/* ListView of Start **************************************************************************************************/
+QListView {
+    show-decoration-selected: 1; /* make the selection span the entire width of the view */
+}
+
+QListView::item:alternate {
+    background: #EEEEEE;
+}
+
+QListView::item:selected {
+    border: 1px solid #6a6ea9;
+}
+
+QListView::item:selected:!active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #ABAFE5, stop: 1 #8588B2);
+}
+
+QListView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #6a6ea9, stop: 1 #888dd9);
+}
+
+QListView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #FAFBFE, stop: 1 #DCDEF1);
+}
+/* ListView of End ****************************************************************************************************/
+
+/* CheckBox of Start **************************************************************************************************/
+QCheckBox {
+    font-size: 16pt;
+    spacing: 5px;
+}
+
+QCheckBox:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                    stop: 0 #FAFBFE, stop: 1 #DCDEF1);
+}
+
+QCheckBox:pressed {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                    stop: 0 #DCDEF1, stop: 1 #FAFBFE);
+}
+
+QCheckBox::indicator {
+    width: 32px;
+    height: 32px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(img/black/png/checkbox_unchecked_icon32.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(img/black/png/checkbox_checked_icon32.png);
+}
+/* CheckBox of End ****************************************************************************************************/
