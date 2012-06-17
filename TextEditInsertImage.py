@@ -5,7 +5,7 @@ __author__ = 'levbrave'
 
 import random
 from PySide import QtCore, QtGui
-from HtmlContent import HtmlContent
+from ImgParser import ImgParser
 
 #**************************************************************************************************
 # class: TextEditInsertImage
@@ -14,44 +14,37 @@ from HtmlContent import HtmlContent
 class TextEditInsertImage(QtGui.QTextEdit):
     """
     TextEdit со возможностью добавления картинок из
-    буфера
+    буфера (Совместим с MSWord)
     """
 
     def __init__(self):
         QtGui.QTextEdit.__init__(self)
 
-    def addResource(self):
-        print 'addResource'
+    def _addResource(self, fileName, imageName):
+        image = QtGui.QImageReader(fileName)
+        # ресурс добавляется в хранилище ресурсов документа
+        self.document().addResource(QtGui.QTextDocument.ImageResource, QtCore.QUrl(imageName), image.read())
 
     def insertFromMimeData(self, source):
         cursor = self.textCursor()
-        document = self.document()
-        htmlContent = HtmlContent()
-
-        print source.html()
-
         # вставка картинки
-        if source.hasImage() and False:
+        if source.hasImage():
             # принятые данные преобразуются в тип QImage
             image = source.imageData()
-            print image
             # генерируется имя ресурса
             image_name = 'image%s' % random.random()
             # ресурс добавляется в хранилище ресурсов документа
-            document.addResource(QtGui.QTextDocument.ImageResource, QtCore.QUrl(image_name), image)
+            self.document().addResource(QtGui.QTextDocument.ImageResource, QtCore.QUrl(image_name), image)
             # картинка вставляется в текст
             cursor.insertImage(image_name)
-            print 'image'
+        elif source.hasHtml and source.html():
+            imgParser = ImgParser(source.html())
 
-        if source.hasHtml:
-            htmlContent.feed(source.html())
-            #html = htmlContent._contentNotImg()
-            #print source.html()
-            #cursor.insertHtml(source.html())
-        if source.hasText:
+            for itemImg in imgParser._listImagePath():
+                # itemImg[0] - path, itemImg[1] - image name
+                self._addResource(itemImg[0], itemImg[1])
+            cursor.insertHtml(imgParser._text())
+        elif source.hasText:
             text = source.text()
-            #cursor.insertText(text)
-            #print 'text'
-
-        QtGui.QTextEdit.insertFromMimeData(self, source)
+            cursor.insertText(text)
 
